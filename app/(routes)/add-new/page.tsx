@@ -6,12 +6,14 @@ import {supabase} from "@/utils/client";
 import {useUser} from "@clerk/nextjs";
 import {toast} from "sonner";
 import {Loader} from "lucide-react";
+import {useRouter} from "next/navigation";
 
 function AddNewAd() {
+    const {user} = useUser()
+    const router = useRouter()
     const [selectedAddress, setSelectedAddress] = React.useState<any>()
     const [coordinates, setCoordinates] = React.useState<{lat: number, lng: number}>()
     const [loading, setLoading] = React.useState(false)
-    const {user} = useUser()
     const continueHandler = async () => {
         setLoading(true)
         const {data, error} = await supabase
@@ -24,8 +26,9 @@ function AddNewAd() {
             ])
             .select()
         if (data) {
-            toast("Address added")
+            //toast("Address added")
             setLoading(false)
+            router.replace(`/edit-ad/${data[0].id}`)
         }
         if (error) {
             toast("Error while adding address")
