@@ -23,12 +23,15 @@ type FormikValuesType = {
     price: number
     hoa: number
     description: string
+    profileImage: string | undefined
+    fullName: string | null | undefined
 }
 
 function EditAd() {
     const params = usePathname()
     const {user} = useUser()
     const router = useRouter()
+    const [adInfo, setAdInfo] = React.useState<FormikValuesType>()
     const checkIsItUsersRecord = async () => {
         if (user) {
             const {data, error} = await supabase
@@ -36,6 +39,9 @@ function EditAd() {
                 .select('*')
                 .eq('createdBy', user.primaryEmailAddress?.emailAddress)
                 .eq('id', params.split('/')[2])
+            if (data) {
+                setAdInfo(data[0])
+            }
             if (!data?.length) {
                 router.replace('/')
             }
@@ -70,7 +76,9 @@ function EditAd() {
             area: 0,
             price: 0,
             hoa: 0,
-            description: ''
+            description: '',
+            profileImage: user?.imageUrl,
+            fullName: user?.fullName
         },
         onSubmit: async (values, formikHelpers: FormikHelpers<FormikValuesType>) => {
             await onSubmitFormHandler(values)
@@ -83,7 +91,7 @@ function EditAd() {
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'}>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Rent or sell?</h2>
-                            <RadioGroup defaultValue="rent" onValueChange={(e) => formik.values.type = e}>
+                            <RadioGroup onValueChange={(e) => formik.values.type = e}>
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="rent" id="rent"/>
                                     <Label htmlFor="rent">Rent</Label>
@@ -96,9 +104,10 @@ function EditAd() {
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Property type</h2>
-                            <Select onValueChange={(e) => formik.values.propertyType = e}>
+                            <Select onValueChange={(e) => formik.values.propertyType = e}
+                                    defaultValue={adInfo?.propertyType}>
                                 <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Select property type"/>
+                                    <SelectValue placeholder={adInfo?.propertyType ? adInfo?.propertyType : "Select property type"}/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Single Family House">Single Family House</SelectItem>
@@ -117,16 +126,19 @@ function EditAd() {
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Bedroom</h2>
                             <Input placeholder={'Ex. 2'} name={'bedroom'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.bedroom}
                                    onChange={formik.handleChange}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Bathroom</h2>
                             <Input placeholder={'Ex. 1'} name={'bathroom'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.bathroom}
                                    onChange={formik.handleChange}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Built In</h2>
                             <Input placeholder={'Ex. 1990'} name={'builtIn'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.builtIn}
                                    onChange={formik.handleChange}/>
                         </div>
                     </div>
@@ -134,16 +146,19 @@ function EditAd() {
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Parking</h2>
                             <Input placeholder={'Ex. Free parking available'} name={'parking'}
+                                   defaultValue={adInfo?.parking}
                                    onChange={formik.handleChange}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Lot size (sq.m)</h2>
                             <Input placeholder={'Ex. 100'} name={'lotSize'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.lotSize}
                                    onChange={formik.handleChange}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Area (sq.m)</h2>
                             <Input placeholder={'Ex. 100'} name={'area'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.area}
                                    onChange={formik.handleChange}/>
                         </div>
                     </div>
@@ -151,11 +166,13 @@ function EditAd() {
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Selling Price ($)</h2>
                             <Input placeholder={'Ex. 100000'} name={'price'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.price}
                                    onChange={formik.handleChange}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>HOA (per month, $)</h2>
                             <Input placeholder={'Ex. 100'} name={'hoa'} type={'number'} min={'0'}
+                                   defaultValue={adInfo?.hoa}
                                    onChange={formik.handleChange}/>
                         </div>
                     </div>
@@ -165,6 +182,7 @@ function EditAd() {
                             <Input placeholder={'Information about your property'}
                                    name={'description'}
                                    className={'max-w-100 h-16'}
+                                   defaultValue={adInfo?.description}
                                    onChange={formik.handleChange}/>
                         </div>
                     </div>
