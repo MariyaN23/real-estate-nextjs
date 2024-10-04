@@ -31,9 +31,10 @@ type FormikValuesType = {
     fullName: string | null | undefined
 }
 
-type AdType = FormikValuesType & {
+export type AdType = FormikValuesType & {
     listingImagesTable: listingImage[]
     id: number
+    address: string
 }
 
 function EditAd() {
