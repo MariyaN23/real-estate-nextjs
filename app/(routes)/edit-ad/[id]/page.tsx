@@ -1,5 +1,5 @@
 "use client"
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Label} from "@/components/ui/label"
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -10,6 +10,9 @@ import {usePathname, useRouter} from "next/navigation";
 import {supabase} from "@/utils/client";
 import {toast} from "sonner";
 import {useUser} from "@clerk/nextjs";
+import UploadFile, {listingImage} from "@/app/(routes)/edit-ad/_components/UploadFile";
+import {Textarea} from "@/components/ui/textarea";
+import {Loader} from "lucide-react";
 
 type FormikValuesType = {
     type: string
@@ -27,16 +30,23 @@ type FormikValuesType = {
     fullName: string | null | undefined
 }
 
+type AdType = FormikValuesType & {
+    listingImagesTable: listingImage[]
+    id: number
+}
+
 function EditAd() {
     const params = usePathname()
     const {user} = useUser()
     const router = useRouter()
-    const [adInfo, setAdInfo] = React.useState<FormikValuesType>()
+    const [adInfo, setAdInfo] = useState<AdType>()
+    const [images, setImages] = useState<FileList | null | undefined>()
+    const [loading, setLoading] = useState(false)
     const checkIsItUsersRecord = async () => {
         if (user) {
             const {data, error} = await supabase
                 .from('listing')
-                .select('*')
+                .select('*, listingImagesTable(listing_id, url)')
                 .eq('createdBy', user.primaryEmailAddress?.emailAddress)
                 .eq('id', params.split('/')[2])
             if (data) {
@@ -51,6 +61,7 @@ function EditAd() {
         user && checkIsItUsersRecord()
     }, [user])
     const onSubmitFormHandler = async (formValues: FormikValuesType) => {
+        setLoading(true)
         const {data, error} = await supabase
             .from('listing')
             .update(formValues)
@@ -58,7 +69,34 @@ function EditAd() {
             .select()
         if (data) {
             toast("Your ad updated and published")
-            console.log(data)
+        }
+        if (images?.length) {
+            for (const img of images) {
+                const file = img
+                const fileName = Date.now().toString()
+                const fileExt = fileName.split('.').pop()
+                const {data, error} = await supabase.storage
+                    .from('listingImages')
+                    .upload(fileName, file, {
+                        contentType: `image/${fileExt}`,
+                        upsert: false
+                    })
+                if (error) {
+                    toast("Error while uploading images")
+                } else {
+                    const imageURL = process.env.NEXT_PUBLIC_IMAGE_URL + fileName
+                    const {data, error} = await supabase
+                        .from('listingImagesTable')
+                        .insert([
+                            {
+                                url: imageURL,
+                                listing_id: params.split('/')[2]
+                            }
+                        ])
+                        .select()
+                }
+            }
+            setLoading(false)
         }
         if (error) {
             toast("Error while updating ad")
@@ -84,6 +122,8 @@ function EditAd() {
             await onSubmitFormHandler(values)
         }
     })
+    // @ts-ignore
+    // @ts-ignore
     return (<section className={'mt-24 my-10 px-10 md:px-36'}>
             <h2 className={'font-bold text-2xl'}>Enter more details</h2>
             <form onSubmit={formik.handleSubmit}>
@@ -107,7 +147,8 @@ function EditAd() {
                             <Select onValueChange={(e) => formik.values.propertyType = e}
                                     defaultValue={adInfo?.propertyType}>
                                 <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder={adInfo?.propertyType ? adInfo?.propertyType : "Select property type"}/>
+                                    <SelectValue
+                                        placeholder={adInfo?.propertyType ? adInfo?.propertyType : "Select property type"}/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Single Family House">Single Family House</SelectItem>
@@ -176,19 +217,27 @@ function EditAd() {
                                    onChange={formik.handleChange}/>
                         </div>
                     </div>
-                    <div className={'grid grid-cols-1 mt-5'}>
+                    <div className={'grid grid-cols-1 mt-5 mb-10'}>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Description</h2>
-                            <Input placeholder={'Information about your property'}
-                                   name={'description'}
-                                   className={'max-w-100 h-16'}
-                                   defaultValue={adInfo?.description}
-                                   onChange={formik.handleChange}/>
+                            <Textarea placeholder={'Information about your property'}
+                                      name={'description'}
+                                      className={'min-h-40'}
+                                      defaultValue={adInfo?.description}
+                                      onChange={formik.handleChange}/>
                         </div>
                     </div>
-                    <div className={'flex gap-7 justify-end mt-5'}>
-                        <Button type={'submit'} variant={'outline'}>Save</Button>
-                        <Button type={'submit'}>Save and Publish</Button>
+                    <div>
+                        <h2 className={'text-lg text-slate-500 mb-5'}>Upload your property images</h2>
+                        <UploadFile setImages={(value) => setImages(value)}
+                                    imagesList={adInfo?.listingImagesTable}
+                        />
+                    </div>
+                    <div className={'flex gap-7 justify-end mt-2'}>
+                        {/*<Button type={'submit'} variant={'outline'}>Save</Button>*/}
+                        <Button disabled={loading} type={'submit'}>
+                            {loading ? <Loader className={'animate-spin'}/> : 'Save and Publish'}
+                        </Button>
                     </div>
                 </div>
             </form>
