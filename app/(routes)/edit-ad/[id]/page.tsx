@@ -13,6 +13,7 @@ import {useUser} from "@clerk/nextjs";
 import UploadFile, {listingImage} from "@/app/(routes)/edit-ad/_components/UploadFile";
 import {Textarea} from "@/components/ui/textarea";
 import {Loader} from "lucide-react";
+import PublishAdAlert from "@/app/(routes)/edit-ad/_components/PublishAdAlert";
 
 type FormikValuesType = {
     type: string
@@ -37,6 +38,7 @@ type AdType = FormikValuesType & {
 
 function EditAd() {
     const params = usePathname()
+    const idFromParams = params.split('/')[2]
     const {user} = useUser()
     const router = useRouter()
     const [adInfo, setAdInfo] = useState<AdType>()
@@ -48,7 +50,7 @@ function EditAd() {
                 .from('listing')
                 .select('*, listingImagesTable(listing_id, url)')
                 .eq('createdBy', user.primaryEmailAddress?.emailAddress)
-                .eq('id', params.split('/')[2])
+                .eq('id', idFromParams)
             if (data) {
                 setAdInfo(data[0])
             }
@@ -65,13 +67,15 @@ function EditAd() {
         const {data, error} = await supabase
             .from('listing')
             .update(formValues)
-            .eq('id', params.split('/')[2])
+            .eq('id', idFromParams)
             .select()
         if (data) {
             toast("Your ad updated and published")
+            setLoading(false)
         }
         if (images?.length) {
             for (const img of images) {
+                setLoading(true)
                 const file = img
                 const fileName = Date.now().toString()
                 const fileExt = fileName.split('.').pop()
@@ -90,7 +94,7 @@ function EditAd() {
                         .insert([
                             {
                                 url: imageURL,
-                                listing_id: params.split('/')[2]
+                                listing_id: idFromParams
                             }
                         ])
                         .select()
@@ -122,8 +126,6 @@ function EditAd() {
             await onSubmitFormHandler(values)
         }
     })
-    // @ts-ignore
-    // @ts-ignore
     return (<section className={'mt-24 my-10 px-10 md:px-36'}>
             <h2 className={'font-bold text-2xl'}>Enter more details</h2>
             <form onSubmit={formik.handleSubmit}>
@@ -234,10 +236,10 @@ function EditAd() {
                         />
                     </div>
                     <div className={'flex gap-7 justify-end mt-2'}>
-                        {/*<Button type={'submit'} variant={'outline'}>Save</Button>*/}
-                        <Button disabled={loading} type={'submit'}>
-                            {loading ? <Loader className={'animate-spin'}/> : 'Save and Publish'}
+                        <Button disabled={loading} type={'submit'} variant={'outline'}>
+                            {loading ? <Loader className={'animate-spin'}/> : 'Save'}
                         </Button>
+                        <PublishAdAlert idFromParams={idFromParams}/>
                     </div>
                 </div>
             </form>
