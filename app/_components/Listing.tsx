@@ -11,7 +11,8 @@ function Listing({allAds}: ListingType) {
     return (
         <div>
             <div className={'grid grid-cols-1 md:grid-cols-2 gap-4'}>
-                {allAds.map((ad, index) => (
+                {allAds.length > 0
+                    ? allAds.map((ad, index) => (
                     <div key={index} className={'p-3 hover:border hover:border-primary cursor-pointer rounded-lg'}>
                         <Image src={ad.listingImagesTable[0].url}
                                width={800} height={150} alt={'img preview'}
@@ -38,7 +39,10 @@ function Listing({allAds}: ListingType) {
                             </div>
                         </div>
                     </div>
-                ))}
+                ))
+                : [1, 2, 3, 4, 5, 6, 7, 8].map((el, index)=> (
+                        <div key={index} className={'h-[230px] w-full bg-slate-200 animate-pulse rounded-lg'}></div>
+                    ))}
             </div>
         </div>
     );
