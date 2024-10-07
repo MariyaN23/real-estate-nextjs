@@ -109,7 +109,7 @@ function EditAd() {
     }
     const formik = useFormik({
         initialValues: {
-            type: 'rent',
+            type: '',
             propertyType: '',
             bedroom: 0,
             bathroom: 0,
