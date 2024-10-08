@@ -3,6 +3,7 @@ import Image from "next/image";
 import {Bath, BedDouble, X} from "lucide-react";
 import {AdType} from "@/app/(routes)/edit-ad/[id]/page";
 import {Button} from "@/components/ui/button";
+import Link from "next/link";
 
 type MarkedItemType = {
     selectedItem: AdType
@@ -24,7 +25,9 @@ function MarkedItem({selectedItem, closeItemHandler}: MarkedItemType) {
                         <BedDouble className={'text-primary h-4 w-4'}/>{selectedItem.bedroom}</span>
                     <span className={'flex justify-center items-center w-full gap-2 text-sm bg-slate-200 rounded-md p-2 text-gray-500'}><Bath className={'text-primary h-4 w-4'}/>{selectedItem.bathroom}</span>
                 </div>
-                <Button>More Details</Button>
+                    <Button>
+                        <Link href={`/view-ad/${selectedItem.id}`}>More Details</Link>
+                    </Button>
             </div>
         </div>
     );

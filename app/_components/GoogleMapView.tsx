@@ -13,7 +13,11 @@ const containerStyle = {
     width: '100%',
     height: '80vh',
     borderRadius: '10px'
-};
+}
+
+const options = {
+    gestureHandling: 'greedy'
+}
 
 function GoogleMapView({coordinates, ads}: GoogleMapViewType) {
     const [center, setCenter] = useState({
@@ -48,6 +52,7 @@ function GoogleMapView({coordinates, ads}: GoogleMapViewType) {
             zoom={12}
             onLoad={onLoad}
             onUnmount={onUnmount}
+            options={options}
         >
             {ads.map((ad, index)=> (
                 <MarkerForMap key={index} item={ad}/>

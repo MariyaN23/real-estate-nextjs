@@ -37,6 +37,7 @@ export type AdType = FormikValuesType & {
     id: number
     address: string
     coordinates: CoordinatesType
+    createdBy: string
 }
 
 function EditAd() {
@@ -191,9 +192,9 @@ function EditAd() {
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5'}>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Parking</h2>
-                            <Input placeholder={'Ex. Free parking available'} name={'parking'}
+                            <Input placeholder={'Ex. Yes'} name={'parking'}
                                    defaultValue={adInfo?.parking}
-                                   onChange={formik.handleChange}/>
+                                   onChange={formik.handleChange} maxLength={10}/>
                         </div>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Lot size (sq.m)</h2>
