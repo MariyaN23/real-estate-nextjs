@@ -14,6 +14,7 @@ import UploadFile, {listingImage} from "@/app/(routes)/edit-ad/_components/Uploa
 import {Textarea} from "@/components/ui/textarea";
 import {Loader} from "lucide-react";
 import PublishAdAlert from "@/app/(routes)/edit-ad/_components/PublishAdAlert";
+import {CoordinatesType} from "@/app/_components/ListingMapView";
 
 type FormikValuesType = {
     type: string
@@ -35,6 +36,7 @@ export type AdType = FormikValuesType & {
     listingImagesTable: listingImage[]
     id: number
     address: string
+    coordinates: CoordinatesType
 }
 
 function EditAd() {

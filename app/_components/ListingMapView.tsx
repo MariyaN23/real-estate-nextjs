@@ -1,13 +1,18 @@
 "use client"
 import React, {useEffect, useState} from 'react';
 import Listing from "@/app/_components/Listing";
-import GoogleMap from "@/app/_components/GoogleMap";
 import {supabase} from "@/utils/client";
 import {AdType} from "@/app/(routes)/edit-ad/[id]/page";
 import {toast} from "sonner";
+import GoogleMapView from './GoogleMapView';
 
 type ListingMapViewType = {
     type: 'rent' | 'sell'
+}
+
+export type CoordinatesType = {
+    lat: number
+    lng: number
 }
 
 function ListingMapView({type}: ListingMapViewType) {
@@ -17,6 +22,7 @@ function ListingMapView({type}: ListingMapViewType) {
     const [bathrooms, setBathrooms] = useState(0)
     const [price, setPrice] = useState(0)
     const [propertyType, setPropertyType] = useState<string | null>('')
+    const [coordinates, setCoordinates] = useState<CoordinatesType>()
     const getLatestListing = async ()=> {
         const {data, error} = await supabase
             .from('listing')
@@ -68,15 +74,18 @@ function ListingMapView({type}: ListingMapViewType) {
         getLatestListing()
     }, [])
     return (
-        <div className={'grid grid-cols-1 md:grid-cols-2'}>
+        <div className={'grid grid-cols-1 md:grid-cols-2 gap-8'}>
             <Listing allAds={ads}
                      searchHandleClick={searchHandleClick}
                      searchedAddress={setSearchedAddress}
                      setPrice={setPrice}
                      setPropertyType={setPropertyType}
                      setBedCount={setBedrooms}
-                     setBathCount={setBathrooms}/>
-            <GoogleMap/>
+                     setBathCount={setBathrooms}
+                     setCoordinates={setCoordinates}/>
+            <div className={'fixed right-10 h-full md:w-[350px] lg:w-[450px] xl:w-[650px]'}>
+                <GoogleMapView coordinates={coordinates} ads={ads}/>
+            </div>
         </div>
     );
 }

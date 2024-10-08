@@ -5,6 +5,7 @@ import {Bath, BedDouble, MapPin, Ruler, Search} from "lucide-react";
 import GoogleAddressSearch from "@/app/_components/GoogleAddressSearch";
 import {Button} from "@/components/ui/button";
 import FilterSearch from "@/app/_components/FilterSearch";
+import {CoordinatesType} from "@/app/_components/ListingMapView";
 
 type ListingType = {
     allAds: AdType[]
@@ -14,10 +15,13 @@ type ListingType = {
     setBathCount: (bath: number) => void
     setPrice: (price: number) => void
     setPropertyType: (type: string | null) => void
+    setCoordinates: (coordinates: CoordinatesType)=> void
 }
 
 function Listing(
-    {allAds, searchHandleClick, searchedAddress, setBedCount, setBathCount, setPropertyType, setPrice}: ListingType) {
+    {allAds, searchHandleClick, searchedAddress,
+        setBedCount, setBathCount, setPropertyType,
+        setPrice, setCoordinates}: ListingType) {
     const [address, setAddress] = useState<{ label: string }>()
     return (
         <div>
@@ -25,7 +29,7 @@ function Listing(
                 <GoogleAddressSearch selectedAddress={(value) => {
                     searchedAddress(value)
                     setAddress(value)
-                }} setCoordinates={(value) => (value)}/>
+                }} setCoordinates={(value)=>setCoordinates(value)}/>
                 <Button className={'flex gap-2 h-full'} onClick={searchHandleClick}>
                     <Search/>
                 </Button>
