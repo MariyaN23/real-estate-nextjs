@@ -52,9 +52,15 @@ function Listing(
                         <Link href={`/view-ad/${ad.id}`}>
                             <div key={index}
                                  className={'p-3 hover:border hover:border-primary cursor-pointer rounded-lg'}>
-                                <Image src={ad.listingImagesTable[0].url}
-                                       width={800} height={150} alt={'img preview'}
-                                       className={'rounded-lg object-cover h-[170px]'}/>
+                                {ad.listingImagesTable && ad.listingImagesTable[0] && (
+                                    <Image
+                                        src={ad.listingImagesTable[0].url}
+                                        width={800}
+                                        height={150}
+                                        alt={'img preview'}
+                                        className={'rounded-lg object-cover h-[170px]'}
+                                    />
+                                )}
                                 <div className={'flex mt-2 flex-col gap-2'}>
                                     <span className={'font-bold text-xl'}>${ad.price}</span>
                                     <span className={'flex gap-2 text-sm text-gray-400'}>
