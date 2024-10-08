@@ -38,6 +38,7 @@ export type AdType = FormikValuesType & {
     address: string
     coordinates: CoordinatesType
     createdBy: string
+    active: boolean
 }
 
 function EditAd() {
