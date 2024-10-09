@@ -17,7 +17,7 @@ import PublishAdAlert from "@/app/(routes)/edit-ad/_components/PublishAdAlert";
 import {CoordinatesType} from "@/app/_components/ListingMapView";
 
 type FormikValuesType = {
-    type: string
+    type: "sell" | "rent"
     propertyType: string
     bedroom: number
     bathroom: number
@@ -30,6 +30,10 @@ type FormikValuesType = {
     description: string
     profileImage: string | undefined
     fullName: string | null | undefined
+}
+
+type validatedErrorsType = {
+    type: string
 }
 
 export type AdType = FormikValuesType & {
@@ -57,6 +61,7 @@ function EditAd() {
                 .eq('createdBy', user.primaryEmailAddress?.emailAddress)
                 .eq('id', idFromParams)
             if (data) {
+                console.log(data[0])
                 setAdInfo(data[0])
             }
             if (!data?.length) {
@@ -75,7 +80,8 @@ function EditAd() {
             .eq('id', idFromParams)
             .select()
         if (data) {
-            toast("Your ad updated and published")
+            toast("Your ad updated")
+            router.replace(`/user/my-ads`)
             setLoading(false)
         }
         if (images?.length) {
@@ -113,21 +119,24 @@ function EditAd() {
     }
     const formik = useFormik({
         initialValues: {
-            type: '',
-            propertyType: '',
-            bedroom: 0,
-            bathroom: 0,
-            builtIn: 0,
-            parking: '',
-            lotSize: 0,
-            area: 0,
-            price: 0,
-            hoa: 0,
-            description: '',
-            profileImage: user?.imageUrl,
-            fullName: user?.fullName
+            type: 'rent',
+            propertyType: adInfo?.propertyType || '',
+            bedroom: adInfo?.bedroom || 0,
+            bathroom: adInfo?.bathroom || 0,
+            builtIn: adInfo?.builtIn || 0,
+            parking: adInfo?.parking || '',
+            lotSize: adInfo?.lotSize || 0,
+            area: adInfo?.area || 0,
+            price: adInfo?.price || 0,
+            hoa: adInfo?.hoa || 0,
+            description: adInfo?.description || '',
+            profileImage: user?.imageUrl || '',
+            fullName: user?.fullName || ''
         },
-        onSubmit: async (values, formikHelpers: FormikHelpers<FormikValuesType>) => {
+        validate: (values)=> {
+
+        },
+        onSubmit: async (values: FormikValuesType) => {
             await onSubmitFormHandler(values)
         }
     })
@@ -138,7 +147,9 @@ function EditAd() {
                     <div className={'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'}>
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Rent or sell?</h2>
-                            <RadioGroup onValueChange={(e) => formik.values.type = e}>
+                            <RadioGroup onValueChange={(e) => formik.setFieldValue('type', e)}
+                                        defaultValue={adInfo?.type === 'sell' ? 'sell' : 'rent'}
+                            >
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="rent" id="rent"/>
                                     <Label htmlFor="rent">Rent</Label>
@@ -152,7 +163,8 @@ function EditAd() {
                         <div className={'flex flex-col gap-2'}>
                             <h2 className={'text-lg text-slate-500'}>Property type</h2>
                             <Select onValueChange={(e) => formik.values.propertyType = e}
-                                    defaultValue={adInfo?.propertyType}>
+                                    defaultValue={adInfo?.propertyType}
+                            >
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue
                                         placeholder={adInfo?.propertyType ? adInfo?.propertyType : "Select property type"}/>
@@ -241,10 +253,10 @@ function EditAd() {
                         />
                     </div>
                     <div className={'flex gap-7 justify-end mt-2'}>
-                        <Button disabled={loading} type={'submit'} variant={'outline'}>
+                        <Button disabled={loading} variant={'outline'}>
                             {loading ? <Loader className={'animate-spin'}/> : 'Save'}
                         </Button>
-                        <PublishAdAlert idFromParams={idFromParams}/>
+                        {!adInfo?.active && <PublishAdAlert idFromParams={idFromParams}/>}
                     </div>
                 </div>
             </form>

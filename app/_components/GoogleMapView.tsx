@@ -7,6 +7,7 @@ import MarkerForMap from "@/app/_components/MarkerForMap";
 type GoogleMapViewType = {
     coordinates: CoordinatesType | undefined
     ads: AdType[]
+    defZoom: number
 }
 
 const containerStyle = {
@@ -19,10 +20,10 @@ const options = {
     gestureHandling: 'greedy'
 }
 
-function GoogleMapView({coordinates, ads}: GoogleMapViewType) {
+function GoogleMapView({coordinates, ads, defZoom}: GoogleMapViewType) {
     const [center, setCenter] = useState({
-        lat: -3.745,
-        lng: -38.523
+        lat: 53.9006011,
+        lng: 27.558972
     })
     useEffect(() => {
         coordinates && setCenter(coordinates)
@@ -35,9 +36,8 @@ function GoogleMapView({coordinates, ads}: GoogleMapViewType) {
     const [map, setMap] = React.useState(null)
 
     const onLoad = React.useCallback(function callback(map: any) {
-        const bounds = new window.google.maps.LatLngBounds(center);
-        map.fitBounds(bounds);
-
+        const bounds = new window.google.maps.LatLngBounds(center)
+        //map.fitBounds(bounds)
         setMap(map)
     }, [])
 
@@ -49,7 +49,7 @@ function GoogleMapView({coordinates, ads}: GoogleMapViewType) {
         <GoogleMap
             mapContainerStyle={containerStyle}
             center={center}
-            zoom={12}
+            zoom={defZoom}
             onLoad={onLoad}
             onUnmount={onUnmount}
             options={options}

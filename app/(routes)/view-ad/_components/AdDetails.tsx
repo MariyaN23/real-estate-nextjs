@@ -49,7 +49,9 @@ function AdDetails({details}: AdDetailsType) {
                 <p className={'font-bold text-2xl mt-4'}>What's special</p>
                 <p>{details?.description}</p>
                 <p className={'font-bold text-2xl mt-4'}>Find on map</p>
-                <GoogleMapView coordinates={details?.coordinates} ads={details ? [details] : []}/>
+                <GoogleMapView coordinates={details?.coordinates}
+                               ads={details ? [details] : []}
+                               defZoom={16}/>
                 <p className={'font-bold text-2xl mt-4'}>Agent details</p>
                 <AgentDetails details={details}/>
             </div>

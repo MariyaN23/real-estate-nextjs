@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, {useEffect} from 'react';
 import GoogleAddressSearch from "@/app/_components/GoogleAddressSearch";
 import {Button} from "@/components/ui/button";
 import {supabase} from "@/utils/client";
@@ -10,6 +10,11 @@ import {useRouter} from "next/navigation";
 
 function AddNewAd() {
     const {user} = useUser()
+    useEffect(() => {
+        if (!user) {
+            router.replace(`/sign-in`)
+        }
+    }, [])
     const router = useRouter()
     const [selectedAddress, setSelectedAddress] = React.useState<any>()
     const [coordinates, setCoordinates] = React.useState<{lat: number, lng: number}>()
@@ -26,7 +31,6 @@ function AddNewAd() {
             ])
             .select()
         if (data) {
-            //toast("Address added")
             setLoading(false)
             router.replace(`/edit-ad/${data[0].id}`)
         }

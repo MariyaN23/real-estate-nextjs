@@ -84,7 +84,7 @@ function ListingMapView({type}: ListingMapViewType) {
                      setBathCount={setBathrooms}
                      setCoordinates={setCoordinates}/>
             <div className={'fixed right-10 h-full md:w-[350px] lg:w-[450px] xl:w-[650px]'}>
-                <GoogleMapView coordinates={coordinates} ads={ads}/>
+                <GoogleMapView coordinates={coordinates} ads={ads} defZoom={11}/>
             </div>
         </div>
     );

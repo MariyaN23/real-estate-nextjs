@@ -12,6 +12,7 @@ import {Button} from "@/components/ui/button";
 import {Loader} from "lucide-react";
 import {supabase} from "@/utils/client";
 import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 type PublishAdAlertType = {
     idFromParams: string
@@ -19,6 +20,7 @@ type PublishAdAlertType = {
 
 function PublishAdAlert({idFromParams}: PublishAdAlertType) {
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
     const publishBtnHandler = async () => {
         setLoading(true)
         const {data, error} = await supabase
@@ -29,6 +31,7 @@ function PublishAdAlert({idFromParams}: PublishAdAlertType) {
         if (data) {
             setLoading(false)
             toast("Your ad published")
+            router.replace(`/user/my-ads`)
         }
     }
     return (

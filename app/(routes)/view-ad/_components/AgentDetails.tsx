@@ -20,7 +20,7 @@ function AgentDetails({details}: AgentDetailsType) {
                         className={'text-gray-500 font-medium'}> {details?.createdBy}</span>
                 </p>
             </div>
-            <Button>Send message</Button>
+            <Button><a href={`mailto:${details?.createdBy}`}>Send message</a></Button>
         </div>
     );
 }

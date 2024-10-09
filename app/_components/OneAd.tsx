@@ -2,6 +2,7 @@ import React from 'react';
 import Image from "next/image";
 import {Bath, BedDouble, MapPin, Ruler} from "lucide-react";
 import {AdType} from "@/app/(routes)/edit-ad/[id]/page";
+import noImg from "../images/noImage.png"
 
 type OneAdType = {
     ad: AdType
@@ -11,15 +12,13 @@ function OneAd({ad}: OneAdType) {
     return (
         <div key={ad.id}
              className={'p-3 hover:border hover:border-primary cursor-pointer rounded-lg'}>
-            {ad.listingImagesTable && ad.listingImagesTable[0] && (
                 <Image
-                    src={ad.listingImagesTable[0].url}
+                    src={ad.listingImagesTable[0] ? ad.listingImagesTable[0].url : noImg}
                     width={800}
                     height={150}
                     alt={'img preview'}
                     className={'rounded-lg object-cover h-[170px]'}
                 />
-            )}
             <div className={'flex mt-2 flex-col gap-2'}>
                 <span className={'font-bold text-xl'}>${ad.price}</span>
                 <span className={'flex gap-2 text-sm text-gray-400'}>
